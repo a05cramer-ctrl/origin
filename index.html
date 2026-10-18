@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ORIGIN</title>
+<meta name="description" content="Every pump.fun runner has one original. ORIGIN finds it, live, and tags every copy.">
+<meta name="theme-color" content="#0a0a08">
+<meta property="og:title" content="ORIGIN">
+<meta property="og:description" content="Every runner has one original. ORIGIN finds it and tags every copy, live.">
+<meta property="og:image" content="og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="og.jpg">
+<link rel="icon" href="favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;800;900&family=Fira+Code:wght@400;500;600&family=Silkscreen:wght@400;700&display=swap" rel="stylesheet">
+<script src="config.js"></script>
+<style>
+:root{
+  --bg:#0a0a08;--p1:#10100d;--p2:#15140f;--p3:#1b1a14;
+  --ln:#23221b;--ln2:#2f2d24;--ln3:#3d3a2f;
+  --tx:#efece3;--t2:#c2beb0;--mu:#8a8676;--fa:#57544a;
+  --gold:#ffc61a;--gold2:#ffe07a;--goldd:#8a6a0c;--goldglow:rgba(255,198,26,.35);
+  --r:14px;--nav:60px;--ease:cubic-bezier(.2,.75,.2,1);
+  --mono:"Fira Code",ui-monospace,monospace;--pix:"Silkscreen",var(--mono);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+[hidden]{display:none!important}
+html,body{overflow-x:clip}
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav) + 44px)}
+body{background:var(--bg);color:var(--tx);font:500 15px/1.55 "Onest",system-ui,sans-serif;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(circle at center,#1c1b15 1px,transparent 1.4px);background-size:14px 14px;background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+button,input{font:inherit;color:inherit}
+::selection{background:var(--gold);color:#000}
+.mono{font-family:var(--mono)}
+.pix{font-family:var(--pix);letter-spacing:.02em}
+.g{color:var(--gold)}
+.mu{color:var(--mu)}
+.fa{color:var(--fa)}
+
+/* NAV */
+nav.top{position:fixed;inset:0 0 auto 0;height:var(--nav);z-index:50;display:flex;align-items:center;justify-content:space-between;padding:0 22px;
+  background:linear-gradient(#0a0a08f0,#0a0a08c0);backdrop-filter:blur(10px);border-bottom:1px solid var(--ln);transition:transform .5s var(--ease),opacity .5s}
+nav.top.away{transform:translateY(-100%);opacity:0}
+.brand{display:flex;align-items:center;gap:10px;font:900 15px "Onest";letter-spacing:.14em}
+.brand img{width:28px;height:28px;border-radius:7px;image-rendering:pixelated}
+.links{display:flex;gap:4px}
+.links a{font-size:13.5px;color:var(--t2);padding:7px 12px;border-radius:99px;transition:background .2s,color .2s}
+.links a:hover{background:var(--p3);color:var(--tx)}
+.links a.on{background:var(--p3);color:var(--tx)}
+.pill{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 16px;border-radius:99px;background:var(--gold);color:#120e00;font:700 13.5px "Onest";border:0;cursor:pointer;transition:transform .2s var(--ease),box-shadow .2s}
+.pill:hover{transform:translateY(-1px);box-shadow:0 0 0 4px #ffc61a26}
+.pill.ghost{background:transparent;color:var(--tx);border:1px solid var(--ln3)}
+.pill.ghost:hover{box-shadow:none;border-color:var(--mu)}
+
+/* TICKER */
+.tick{position:fixed;top:var(--nav);left:0;right:0;height:36px;z-index:49;background:#0a0a08e8;border-bottom:1px solid var(--ln);overflow:hidden;display:flex;align-items:center;transition:transform .5s var(--ease),opacity .5s}
+.tick.away{transform:translateY(-200%);opacity:0}
+.tick .lead{flex:none;display:flex;align-items:center;gap:8px;padding:0 16px;height:100%;border-right:1px solid var(--ln);font:500 11.5px var(--mono);color:var(--mu);background:var(--bg);z-index:2;letter-spacing:.06em}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--gold);box-shadow:0 0 8px var(--gold);animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.35}}
+.tick .rail{display:flex;gap:34px;white-space:nowrap;animation:rail 60s linear infinite;padding-left:30px;font:500 12px var(--mono);color:var(--t2)}
+.tick:hover .rail{animation-play-state:paused}
+@keyframes rail{to{transform:translateX(-50%)}}
+.tick .it{display:inline-flex;align-items:center;gap:8px}
+.tick .it img{width:18px;height:18px;border-radius:50%;object-fit:cover;filter:grayscale(.2)}
+
+/* HERO / INTRO */
+#hero{position:relative;height:100svh;min-height:620px;overflow:hidden;background:var(--bg)}
+#stage{position:absolute;inset:0;width:100%;height:100%;display:block}
+.skip{position:absolute;right:22px;bottom:20px;z-index:5;background:none;border:0;cursor:pointer;font:500 11px var(--mono);letter-spacing:.24em;color:var(--fa);padding:8px;transition:color .2s,opacity .4s}
+.skip:hover{color:var(--tx)}
+.prog{position:absolute;left:50%;bottom:64px;width:min(260px,50vw);height:1px;background:var(--ln2);transform:translateX(-50%);z-index:4;transition:opacity .5s}
+.prog i{display:block;height:100%;width:0;background:var(--tx)}
+.cap{position:absolute;left:50%;transform:translateX(-50%);text-align:center;z-index:4;pointer-events:none;width:min(720px,92vw);transition:opacity .5s}
+.cap .k{font:700 11px var(--pix);letter-spacing:.2em;color:var(--mu)}
+.cap .v{font:800 clamp(18px,2.4vw,24px)/1.2 "Onest";margin-top:6px}
+.heroUI{position:absolute;left:0;right:0;bottom:0;z-index:6;display:flex;flex-direction:column;align-items:center;padding:0 16px 54px;opacity:0;transform:translateY(16px);transition:opacity .9s var(--ease),transform .9s var(--ease);pointer-events:none}
+.heroUI.on{opacity:1;transform:none;pointer-events:auto}
+.heroUI h1{font:900 clamp(30px,5.2vw,64px)/1 "Onest";letter-spacing:-.035em;text-align:center;max-width:16ch}
+.heroUI h1 em{font-style:normal;color:var(--gold)}
+.heroUI p.sub{margin-top:14px;color:var(--t2);font-size:clamp(14px,1.5vw,16.5px);text-align:center;max-width:56ch}
+.search{margin-top:24px;display:flex;align-items:center;gap:8px;width:min(580px,100%);height:54px;padding:0 6px 0 18px;border-radius:99px;background:#0e0e0bf0;border:1px solid var(--ln3);transition:border-color .2s,box-shadow .2s}
+.search:focus-within{border-color:var(--gold);box-shadow:0 0 0 5px #ffc61a1c}
+.search span{font:500 14px var(--mono);color:var(--fa)}
+.search input{flex:1;min-width:0;background:none;border:0;outline:0;font:500 14px var(--mono);color:var(--tx)}
+.search input::placeholder{color:var(--fa)}
+.search .pill{height:42px}
+.heroUI .row{display:flex;gap:22px;margin-top:16px;font:500 13px var(--mono);color:var(--mu)}
+.heroUI .row a:hover{color:var(--tx)}
+
+/* SECTIONS */
+main{position:relative;z-index:2}
+section.sec{padding:120px 22px 40px;max-width:1180px;margin:0 auto}
+.sh{display:grid;grid-template-columns:44px 1fr;gap:0 4px;align-items:end;margin-bottom:26px}
+.sh .n{font:500 12px var(--mono);color:var(--fa);padding-bottom:12px}
+.sh canvas.ht{display:block;height:auto;max-width:100%}
+.sh p{grid-column:2;margin-top:14px;color:var(--t2);max-width:64ch;font-size:15.5px}
+.card{background:var(--p1);border:1px solid var(--ln);border-radius:var(--r)}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 18px;font:500 12px var(--mono);color:var(--mu);padding:12px 16px;margin-bottom:14px}
+.meta b{color:var(--tx);font-weight:600}
+.meta .gb{color:var(--gold)}
+.skel{background:linear-gradient(90deg,var(--p2),var(--p3),var(--p2));background-size:200% 100%;animation:sk 1.4s infinite;border-radius:8px}
+@keyframes sk{to{background-position:-200% 0}}
+
+/* BOARD */
+.board{display:flex;flex-direction:column;gap:10px}
+.rowc{display:grid;grid-template-columns:34px minmax(0,1.25fr) minmax(0,1.15fr) minmax(0,1.35fr) 110px;gap:18px;align-items:center;padding:16px 18px;transition:border-color .25s,background .25s;cursor:pointer}
+.rowc:hover{border-color:var(--ln3);background:var(--p2)}
+.rk{font:500 12px var(--mono);color:var(--fa)}
+.coin{display:flex;align-items:center;gap:12px;min-width:0}
+.av{position:relative;flex:none;width:44px;height:44px;border-radius:50%;background:var(--p3);overflow:visible}
+.av img{position:relative;width:100%;height:100%;border-radius:50%;object-fit:cover;display:block}
+.av .ini{position:absolute;inset:0;display:grid;place-items:center;font-family:var(--pix);color:var(--mu);border-radius:50%;background:radial-gradient(circle,#2a281f 1px,transparent 1.5px) 0 0/5px 5px,var(--p3)}
+.av.og .ini{color:var(--gold)}
+.av .bd{z-index:2}
+.av.grey img{filter:grayscale(1) contrast(.9) brightness(.8)}
+.av .bd{position:absolute;right:-5px;bottom:-5px;width:20px;height:20px;image-rendering:pixelated}
+.av.og{box-shadow:0 0 0 2px var(--gold),0 0 18px var(--goldglow)}
+.coin .t{min-width:0}
+.coin .nm{font:700 15px "Onest";white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.coin .sb{font:500 12px var(--mono);color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.verdict{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font:700 11.5px var(--pix);letter-spacing:.06em;padding:6px 10px;border-radius:6px;white-space:nowrap}
+.verdict.og{background:#ffc61a18;color:var(--gold);border:1px solid #ffc61a55}
+.verdict.cp{background:var(--p3);color:var(--t2);border:1px solid var(--ln2)}
+.vcol{display:flex;flex-direction:column;gap:6px;min-width:0}
+.vcol .s{font:500 12px var(--mono);color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.strip{display:flex;align-items:center;min-width:0}
+.strip .m{width:26px;height:26px;border-radius:50%;margin-left:-7px;border:2px solid var(--p1);background:var(--p3);flex:none;overflow:hidden;transition:transform .2s}
+.strip .m:first-child{margin-left:0}
+.strip .m img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.75)}
+.strip .m.me{border-color:var(--tx)}
+.strip .m.me img{filter:none}
+.strip .more{font:500 12px var(--mono);color:var(--mu);margin-left:10px;white-space:nowrap}
+.rowc:hover .strip .m{transform:translateY(-2px)}
+.go{justify-self:end;font:500 12.5px var(--mono);color:var(--mu);white-space:nowrap}
+.rowc:hover .go{color:var(--tx)}
+
+/* CHECK */
+.checkbox{padding:22px}
+.checkbox .search{margin:0;width:100%}
+.res{margin-top:18px}
+.vc{display:grid;grid-template-columns:auto 1fr;gap:26px;align-items:center;padding:26px;border-radius:var(--r);border:1px solid var(--ln2);background:var(--p2);animation:rise .6s var(--ease)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}}
+.vc.isog{border-color:#ffc61a66;background:radial-gradient(120% 140% at 0% 0%,#ffc61a14,transparent 60%),var(--p2)}
+.vc .big{width:108px;height:108px}
+.vc .big img{border-radius:50%}
+.vc .big .bd{width:40px;height:40px;right:-8px;bottom:-8px}
+.vc h3{font:900 clamp(26px,3.4vw,40px)/1.05 "Onest";letter-spacing:-.02em}
+.vc .line{margin-top:10px;color:var(--t2);font-size:15px}
+.vc .facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.fact{font:500 12px var(--mono);padding:6px 10px;border-radius:6px;background:var(--p3);border:1px solid var(--ln2);color:var(--t2)}
+.fact b{color:var(--tx);font-weight:600}
+.fact.g{border-color:#ffc61a44;color:var(--gold)}
+.vc .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.err{font:500 13px var(--mono);color:var(--mu);padding:14px 4px}
+
+/* LINEAGE */
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:6px;margin-bottom:14px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 5px;border-radius:99px;background:var(--p1);border:1px solid var(--ln);cursor:pointer;font:600 13px "Onest";color:var(--t2);transition:all .2s}
+.chip img{width:26px;height:26px;border-radius:50%;object-fit:cover}
+.chip.on{border-color:var(--gold);color:var(--tx);background:#ffc61a10}
+.lin{position:relative;padding:0;overflow:hidden}
+#lineage{display:block;width:100%;height:420px;cursor:crosshair}
+.tip{position:absolute;pointer-events:none;z-index:3;min-width:180px;padding:10px 12px;border-radius:10px;background:#0b0b09f5;border:1px solid var(--ln3);font:500 12px var(--mono);color:var(--t2);opacity:0;transition:opacity .15s;box-shadow:0 10px 30px #0008}
+.tip b{color:var(--tx);font:700 13px "Onest"}
+.lin .leg{position:absolute;left:16px;top:14px;display:flex;gap:16px;font:500 11.5px var(--mono);color:var(--mu)}
+.lin .leg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+
+/* LIVE */
+.live{display:grid;grid-template-columns:1fr 300px;gap:14px}
+.feed{padding:8px;height:430px;overflow:hidden;position:relative;-webkit-mask:linear-gradient(#000 80%,transparent)}
+.fr{display:grid;grid-template-columns:36px 1fr auto;gap:12px;align-items:center;padding:9px 10px;border-radius:10px;animation:drop .5s var(--ease)}
+@keyframes drop{from{opacity:0;transform:translateY(-14px)}}
+.fr .ic{width:36px;height:36px;border-radius:50%;background:var(--p3);display:grid;place-items:center;font:700 10px var(--pix);color:var(--fa);overflow:hidden}
+.fr .ic img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) brightness(.8)}
+.fr .x{min-width:0}
+.fr .x b{display:block;font:600 14px "Onest";white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--t2)}
+.fr .x span{font:500 11.5px var(--mono);color:var(--fa)}
+.fr .tag{font:700 10.5px var(--pix);letter-spacing:.05em;color:var(--fa)}
+.fr.hit{background:var(--p3);border:1px solid var(--ln2)}
+.fr.hit .x b{color:var(--tx)}
+.fr.hit .tag{color:var(--tx);padding:5px 8px;border-radius:6px;border:1px solid var(--ln3);background:var(--p2)}
+.fr.hit .stamp{display:inline-block;transform:rotate(-4deg)}
+.stats{display:flex;flex-direction:column;gap:10px}
+.stat{padding:18px}
+.stat .k{font:500 11.5px var(--mono);color:var(--mu)}
+.stat .v{font:900 40px/1.1 "Onest";letter-spacing:-.02em;margin-top:4px}
+.stat .v.g{color:var(--gold)}
+.stat .d{font:500 12px var(--mono);color:var(--fa);margin-top:4px}
+
+/* BUY */
+.buy{display:grid;grid-template-columns:1.1fr 1fr;gap:14px}
+.clock{padding:26px;display:flex;flex-direction:column;justify-content:space-between;min-height:300px;position:relative;overflow:hidden}
+.clock .k{font:500 12px var(--mono);color:var(--mu)}
+.clock .cd{font:900 clamp(56px,8vw,104px)/1 "Onest";letter-spacing:-.04em;font-variant-numeric:tabular-nums;margin:12px 0}
+.clock .cd span{color:var(--fa)}
+.target{display:flex;align-items:center;gap:16px;padding:16px;border-radius:12px;background:var(--p2);border:1px solid #ffc61a40}
+.target .av{width:56px;height:56px}
+.target .t1{font:700 11px var(--pix);color:var(--gold);letter-spacing:.06em}
+.target .t2{font:800 18px "Onest";margin-top:2px}
+.target .t3{font:500 12px var(--mono);color:var(--mu);margin-top:2px}
+.rules{padding:26px}
+.rules h4{font:800 18px "Onest";margin-bottom:14px}
+.rules ol{list-style:none;counter-reset:r;display:flex;flex-direction:column;gap:12px}
+.rules li{counter-increment:r;display:grid;grid-template-columns:28px 1fr;gap:8px;color:var(--t2);font-size:14.5px}
+.rules li::before{content:counter(r,decimal-leading-zero);font:500 12px var(--mono);color:var(--fa);padding-top:2px}
+.log{margin-top:14px;padding:8px}
+.lr{display:grid;grid-template-columns:150px 1fr auto;gap:12px;padding:10px 12px;border-bottom:1px solid var(--ln);font:500 12.5px var(--mono);color:var(--t2)}
+.lr:last-child{border-bottom:0}
+
+/* HOW */
+.how{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.how .card{padding:24px}
+.how .card .n{font:500 12px var(--mono);color:var(--fa)}
+.how .card h4{font:800 19px/1.2 "Onest";margin:10px 0 10px;letter-spacing:-.01em}
+.how .card p{color:var(--t2);font-size:14.5px}
+.how .card code{font:500 12.5px var(--mono);color:var(--tx);background:var(--p3);padding:2px 6px;border-radius:5px}
+.real{margin-top:14px;padding:24px;display:grid;grid-template-columns:repeat(2,1fr);gap:12px 30px}
+.real div{color:var(--t2);font-size:14.5px;padding-left:22px;position:relative}
+.real div::before{content:"";position:absolute;left:0;top:7px;width:8px;height:8px;background:var(--gold);box-shadow:0 0 0 3px #ffc61a22}
+.real b{color:var(--tx)}
+
+/* TOKEN */
+.tok{display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center;padding:34px;overflow:hidden;position:relative}
+.tok img.mk{width:150px;height:150px;border-radius:24px;image-rendering:pixelated;box-shadow:0 0 0 1px var(--ln2),0 0 60px #ffc61a22}
+.tok h3{font:900 clamp(32px,4vw,52px)/1 "Onest";letter-spacing:-.03em}
+.tok p{color:var(--t2);margin-top:12px;max-width:52ch}
+.ca{margin-top:18px;display:flex;align-items:center;gap:10px;max-width:560px;padding:6px 6px 6px 16px;border-radius:99px;border:1px solid var(--ln3);background:var(--bg);font:500 13px var(--mono);color:var(--t2);cursor:pointer}
+.ca span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tok .acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+footer{max-width:1180px;margin:0 auto;padding:60px 22px 60px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px;font:500 12px var(--mono);color:var(--fa)}
+
+.toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,20px);opacity:0;z-index:99;background:var(--gold);color:#120e00;font:700 13px "Onest";padding:10px 16px;border-radius:99px;transition:all .3s var(--ease);pointer-events:none}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+.reveal{opacity:0;transform:translateY(18px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
+.reveal.in{opacity:1;transform:none}
+
+@media (max-width:980px){
+  .links{display:none}
+  .rowc{grid-template-columns:24px minmax(0,1fr);gap:10px 12px}
+  .rowc .vcol{grid-column:2}
+  .rowc .rk{align-self:start;padding-top:14px}
+  .rowc .go{display:none}
+  .live,.buy{grid-template-columns:1fr}
+  .stats{flex-direction:row;flex-wrap:wrap}.stat{flex:1;min-width:140px}
+  .how{grid-template-columns:1fr}
+  .real{grid-template-columns:1fr}
+}
+@media (max-width:600px){
+  nav.top{padding:0 14px}
+  .pill{height:44px}.chip{height:44px}.search .pill{height:42px}
+  section.sec{padding:96px 16px 30px}
+  .sh{grid-template-columns:1fr}.sh .n{padding:0 0 6px}.sh p{grid-column:1}
+  .vc{grid-template-columns:1fr;gap:18px;padding:20px}
+  .vc .big{width:84px;height:84px}
+  .tok{grid-template-columns:1fr;padding:24px;gap:20px}
+  .tok img.mk{width:110px;height:110px}
+  .heroUI{padding-bottom:40px}
+  .search{height:50px}
+  .search .pill{padding:0 12px}
+  .lr{grid-template-columns:1fr auto}.lr .when{grid-column:1/3}
+  #lineage{height:340px}
+  .feed{height:380px}
+  .tick .lead .lbl{display:none}
+}
+@media (prefers-reduced-motion:reduce){.tick .rail{animation:none}}
+</style>
+</head>
+<body>
+
+<nav class="top away" id="nav">
+  <a class="brand" href="#hero"><img src="mark.png" alt="">ORIGIN</a>
+  <div class="links" id="links">
+    <a href="#board">Board</a><a href="#check">Check</a><a href="#lineage-sec">Lineage</a><a href="#live">Live</a><a href="#buy">Hourly buy</a><a href="#how">How it works</a>
+  </div>
+  <a class="pill" id="navbuy" href="#token">$ORIGIN</a>
+</nav>
+<div class="tick away" id="tick"><div class="lead"><span class="dot"></span><span class="lbl" id="ticklbl">SCANNING</span></div><div class="rail" id="rail"></div></div>
+
+<header id="hero">
+  <canvas id="stage"></canvas>
+  <div class="cap" id="cap" style="top:16%"><div class="k" id="capk">READING THE CHAIN</div><div class="v" id="capv">&nbsp;</div></div>
+  <div class="prog" id="prog"><i id="progi"></i></div>
+  <button class="skip" id="skip">SKIP ›</button>
+  <div class="heroUI" id="heroUI">
+    <h1 id="h1">Every runner has <em>one original.</em></h1>
+    <p class="sub" id="sub">ORIGIN reads every coin on Solana that shares a runner's name and ticker, finds the first one created, and tags every copy. Live, every minute.</p>
+    <form class="search" id="heroForm" autocomplete="off"><span>$</span><input id="heroIn" placeholder="paste any contract address" spellcheck="false"><button class="pill" type="submit">Find the OG</button></form>
+      </div>
+</header>
+
+<main>
+<section class="sec" id="board">
+  <div class="sh reveal"><div class="n">01</div><canvas class="ht" data-t="BOARD"></canvas>
+    <p>The ten pump.fun coins doing the most volume this hour, each next to the coin it copied. Most of the time the one pumping isn't the first.</p></div>
+  <div class="meta card reveal" id="bmeta"><span class="skel" style="width:60%;height:14px"></span></div>
+  <div class="board" id="boardList"></div>
+</section>
+
+<section class="sec" id="check">
+  <div class="sh reveal"><div class="n">02</div><canvas class="ht" data-t="CHECK"></canvas>
+    <p>Paste any contract address. ORIGIN pulls every coin on Solana with the same name and ticker, sorts them by the moment they were created, and tells you where yours sits in line.</p></div>
+  <div class="card checkbox reveal">
+    <form class="search" id="checkForm" autocomplete="off"><span>$</span><input id="checkIn" placeholder="contract address" spellcheck="false"><button class="pill" type="submit">Check</button></form>
+    <div class="res" id="checkRes"></div>
+  </div>
+</section>
+
+<section class="sec" id="lineage-sec">
+  <div class="sh reveal"><div class="n">03</div><canvas class="ht" data-t="LINEAGE"></canvas>
+    <p>Every coin in one family, lined up in the order it was born. Dot size is market cap. The gold one came first; everything to its right is a copy.</p></div>
+  <div class="chips reveal" id="chips"></div>
+  <div class="card lin reveal"><div class="leg"><span><i style="background:var(--gold)"></i>original</span><span><i style="background:var(--tx)"></i>pumping now</span><span><i style="background:var(--fa)"></i>copy</span></div><canvas id="lineage"></canvas><div class="tip" id="tip"></div></div>
+</section>
+
+<section class="sec" id="live">
+  <div class="sh reveal"><div class="n">04</div><canvas class="ht" data-t="LIVE"></canvas>
+    <p>Every new pump.fun launch, read off the chain as it's created. When one copies a runner on the board, ORIGIN stamps it with its place in line.</p></div>
+  <div class="live reveal">
+    <div class="card feed" id="feed"></div>
+    <div class="stats">
+      <div class="card stat"><div class="k">launches read</div><div class="v" id="sLaunch">0</div><div class="d">since you opened this page</div></div>
+      <div class="card stat"><div class="k">copies caught</div><div class="v g" id="sCopy">0</div><div class="d" id="sCopyD">of runners on the board</div></div>
+      <div class="card stat"><div class="k">feed</div><div class="v" style="font-size:20px;margin-top:8px" id="sFeed">connecting…</div><div class="d">PumpPortal create events</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="buy">
+  <div class="sh reveal"><div class="n">05</div><canvas class="ht" data-t="HOURLY"></canvas>
+    <p>At the top of every UTC hour, $ORIGIN's creator fees buy the original of whichever runner did the most volume that hour. Never the copy. The wallet is public.</p></div>
+  <div class="buy reveal">
+    <div class="card clock">
+      <div><div class="k">next buy · :00 UTC</div><div class="cd" id="cd">--<span>:</span>--</div></div>
+      <div class="target" id="target"><span class="skel" style="width:100%;height:56px"></span></div>
+    </div>
+    <div class="card rules"><h4>The rules</h4><ol>
+      <li>Every hour at :00 UTC the buyer reads the board.</li>
+      <li>It takes the runner with the most volume in the last hour and finds its original.</li>
+      <li>It buys the original with the creator fees collected that hour. If the original has no pool left to buy from, the SOL rolls into the next hour.</li>
+      <li>Each buy is a Jupiter swap, quoted first and skipped above 4% price impact.</li>
+      <li>Bought coins are held in the public wallet. Every buy is listed below with its transaction.</li>
+    </ol></div>
+  </div>
+  <div class="card log" id="log" hidden></div>
+</section>
+
+<section class="sec" id="how">
+  <div class="sh reveal"><div class="n">06</div><canvas class="ht" data-t="HOW"></canvas>
+    <p>No guesses. Every verdict comes from on-chain create times anyone can check.</p></div>
+  <div class="how">
+    <div class="card reveal"><div class="n">01</div><h4>Find the family</h4><p>Take a runner's ticker. Pull every Solana coin that uses it from Jupiter's token index and pump.fun's coin list. Keep the ones with the same name, too: <code>$MEGA</code> "Make Europe Great Again" is family, <code>$MEGA</code> "Mega Dog" is just squatting the ticker.</p></div>
+    <div class="card reveal"><div class="n">02</div><h4>Sort by birth</h4><p>Each coin's create time is its first pool on-chain, or pump.fun's create timestamp, whichever is earlier. The oldest is the original. Every other coin gets its place: <code>copy #18</code>, and how late it was.</p></div>
+    <div class="card reveal"><div class="n">03</div><h4>Check the picture</h4><p>Your browser hashes every PFP down to an 8×8 fingerprint and compares it with the original's. A copy that stole the art shows its match score.</p></div>
+  </div>
+  <div class="card real reveal">
+    <div><b>Runners are live.</b> Jupiter's most-traded board, pump.fun coins only, refreshed every minute.</div>
+    <div><b>Families are complete.</b> Up to 100 Jupiter matches plus 100 pump.fun matches per ticker, merged by address.</div>
+    <div><b>New launches are read off the chain.</b> PumpPortal create events, the moment they happen.</div>
+    <div><b>Every buy is public.</b> The hourly buyer's wallet and transactions are on Solana for anyone to check.</div>
+  </div>
+</section>
+
+<section class="sec" id="token">
+  <div class="card tok reveal">
+    <img class="mk" src="mark.png" alt="ORIGIN">
+    <div>
+      <h3>$ORIGIN</h3>
+      <p>The coin that pays for the hourly buy. Its creator fees buy the original of the hottest runner, every hour, forever.</p>
+      <div class="ca" id="caBox" hidden><span id="caTxt"></span><button class="pill" type="button">Copy</button></div>
+      <div class="acts"><a class="pill" id="aBuy" target="_blank" rel="noopener" hidden>Buy on pump.fun</a><a class="pill ghost" id="aChart" target="_blank" rel="noopener" hidden>Chart</a><a class="pill ghost" id="aX" target="_blank" rel="noopener" hidden>X</a></div>
+    </div>
+  </div>
+</section>
+</main>
+<footer><span>ORIGIN · every runner has one original</span><span id="foot">data: Jupiter · pump.fun · PumpPortal</span></footer>
+<div class="toast" id="toast"></div>
+
+<script>
+(()=>{
+const CFG = window.ORIGIN_CFG || {};
+const SNAP = window.ORIGIN_SNAPSHOT || null;        // preview only: one real captured scan
+const ICONS = (SNAP && SNAP.icons) || {};
+const $ = (s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const DPR = Math.min(2, window.devicePixelRatio||1);
+const GOLD='#ffc61a';
+const esc = s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const norm = s=>String(s||'').toUpperCase().replace(/^\$/,'').replace(/\s+/g,'').trim();
+const words=s=>String(s||'').toLowerCase().normalize('NFKD').replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean);
+function sameName(a,b){const A=words(a),B=words(b);if(!A.length||!B.length)return false;const ja=A.join(''),jb=B.join('');if(ja===jb)return true;const s=ja.length<jb.length?ja:jb,l=ja.length<jb.length?jb:ja;if(s.length>=4&&l.includes(s)&&s.length/l.length>=.6)return true;const sa=new Set(A),sb=new Set(B);let i=0;for(const w of sa)if(sb.has(w))i++;return i/new Set([...A,...B]).size>=.6}
+const short = m=>m?m.slice(0,4)+'…'+m.slice(-4):'';
+function money(n){n=+n||0;if(n>=1e9)return'$'+(n/1e9).toFixed(2)+'B';if(n>=1e6)return'$'+(n/1e6).toFixed(n>=1e7?1:2)+'M';if(n>=1e3)return'$'+(n/1e3).toFixed(n>=1e4?0:1)+'K';return'$'+Math.round(n)}
+function late(ms){ms=Math.max(0,ms);const s=ms/1e3,m=s/60,h=m/60,d=h/24;if(d>=365)return(d/365).toFixed(1).replace('.0','')+'y';if(d>=1)return Math.round(d)+'d';if(h>=1)return Math.floor(h)+'h '+Math.round(m%60)+'m';if(m>=1)return Math.round(m)+'m';return Math.round(s)+'s'}
+function when(ts){const d=new Date(ts);return d.toISOString().slice(0,10)+' '+d.toISOString().slice(11,16)+' UTC'}
+const ord = n=>n===0?'the original':'copy #'+n;
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('on');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('on'),1600)}
+
+/* ---------- images: real PFP pixels ---------- */
+const imgCache=new Map();
+function iconURL(t){ if(!t)return null; if(ICONS[t.mint])return ICONS[t.mint]; if(SNAP)return null; return t.icon?('/api/img?u='+encodeURIComponent(t.icon)):null }
+function loadImg(t){
+  const u=iconURL(t); if(!u) return Promise.resolve(null);
+  if(imgCache.has(u)) return imgCache.get(u);
+  const p=new Promise(res=>{const im=new Image();im.crossOrigin='anonymous';im.decoding='async';im.onload=()=>res(im);im.onerror=()=>res(null);im.src=u;});
+  imgCache.set(u,p); return p;
+}
+const pixCache=new WeakMap();
+function pixels(im,n=24){ // n×n grid of pixels, centre-cropped
+  if(!im) return null; let c=pixCache.get(im); if(c&&c[n]) return c[n]; c=c||{};
+  const cv=document.createElement('canvas');cv.width=cv.height=n;const x=cv.getContext('2d',{willReadFrequently:true});
+  const k=Math.min(im.naturalWidth,im.naturalHeight)||1;
+  try{x.drawImage(im,(im.naturalWidth-k)/2,(im.naturalHeight-k)/2,k,k,0,0,n,n);c[n]=x.getImageData(0,0,n,n).data;}catch(e){c[n]=null}
+  pixCache.set(im,c); return c[n];
+}
+function ahash(im){const p=pixels(im,8);if(!p)return null;const g=[];for(let i=0;i<64;i++)g.push(p[i*4]*.3+p[i*4+1]*.59+p[i*4+2]*.11);const avg=g.reduce((a,b)=>a+b)/64;return g.map(v=>v>avg?1:0)}
+function match(a,b){if(!a||!b)return null;let s=0;for(let i=0;i<64;i++)if(a[i]===b[i])s++;return Math.round(s/64*100)}
+
+/* ---------- pixel badge (the mark) ---------- */
+const BADGE = [ // 16x16 scalloped seal; 1 gold, 2 check (black)
+"0000001111000000","0001111111111000","0011111111111100","0111111111111110","0111111111111110","1111111111112111","1111111111122111","1112111111221111",
+"1112211112211111","1111221122111111","1111122221111111","0111112211111110","0111111111111110","0011111111111100","0001111111111000","0000001111000000"];
+const badgeCv=(()=>{const c=document.createElement('canvas');c.width=c.height=16;const x=c.getContext('2d');BADGE.forEach((r,y)=>[...r].forEach((v,i)=>{if(v==='0')return;x.fillStyle=v==='1'?GOLD:'#0a0a08';x.fillRect(i,y,1,1)}));return c})();
+const BADGE_URL=badgeCv.toDataURL();
+function badge(ctx,x,y,s,a=1){ctx.save();ctx.globalAlpha=a;ctx.imageSmoothingEnabled=false;ctx.shadowColor=GOLD;ctx.shadowBlur=s*.6;ctx.drawImage(badgeCv,x-s/2,y-s/2,s,s);ctx.restore()}
+
+/* ---------- halftone disc ---------- */
+// Draws a coin's real PFP as halftone dots inside a circle. grey 0..1 desaturates, solid 0..1 crossfades to the real image.
+function halftone(ctx,im,cx,cy,R,{grey=0,solid=0,alpha=1,cells=18}={}){
+  if(alpha<=0.01||R<1)return;
+  const p=pixels(im,24);
+  ctx.save();ctx.globalAlpha=alpha;
+  const step=(R*2)/cells, r0=step*.5;
+  for(let j=0;j<cells;j++)for(let i=0;i<cells;i++){
+    const dx=(i+.5)*step-R, dy=(j+.5)*step-R; if(dx*dx+dy*dy>R*R)continue;
+    let rr=110,gg=106,bb=94;
+    if(p){const sx=Math.min(23,Math.floor((i+.5)/cells*24)),sy=Math.min(23,Math.floor((j+.5)/cells*24)),k=(sy*24+sx)*4;rr=p[k];gg=p[k+1];bb=p[k+2];}
+    const L=(rr*.3+gg*.59+bb*.11)/255;
+    const gv=60+L*150; rr=rr+(gv-rr)*grey; gg=gg+(gv-gg)*grey; bb=bb+(gv-bb)*grey;
+    ctx.fillStyle=`rgb(${rr|0},${gg|0},${bb|0})`;
+    const rad=r0*(.28+.72*Math.sqrt(Math.max(.04,L)));
+    ctx.beginPath();ctx.arc(cx+dx,cy+dy,rad,0,6.283);ctx.fill();
+  }
+  if(solid>0&&im){ctx.globalAlpha=alpha*solid;ctx.beginPath();ctx.arc(cx,cy,R,0,6.283);ctx.clip();const k=Math.min(im.naturalWidth,im.naturalHeight);try{ctx.drawImage(im,(im.naturalWidth-k)/2,(im.naturalHeight-k)/2,k,k,cx-R,cy-R,R*2,R*2)}catch(e){}}
+  ctx.restore();
+}
+
+/* ---------- data ---------- */
+let DATA=null; const listeners=[];
+async function getScan(){
+  if(SNAP) return SNAP;
+  const r=await fetch('/api/scan',{cache:'no-store'}); if(!r.ok) throw new Error('scan '+r.status); return r.json();
+}
+async function refresh(){
+  try{ const d=await getScan(); if(!d||!d.runners)throw 0; d.runners=d.runners.filter(x=>x.og&&x.runner); DATA=d; listeners.forEach(f=>f(d)); }
+  catch(e){ if(!DATA) $('#bmeta').innerHTML='<span class="mu">Scan didn\'t answer. Retrying…</span>'; }
+}
+const onData=f=>{listeners.push(f);if(DATA)f(DATA)};
+
+/* ---------- INTRO ---------- */
+const stage=$('#stage'), sx=stage.getContext('2d');
+let W=0,H=0;
+function size(){W=stage.clientWidth;H=stage.clientHeight;stage.width=W*DPR;stage.height=H*DPR;sx.setTransform(DPR,0,0,DPR,0,0)}
+size(); addEventListener('resize',()=>{size();layoutIntro();layoutHero()});
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+const T_SWARM=.3,T_SORT=2.1,T_STAMP=3.5,T_RISE=5.0,T_SETTLE=6.2,T_END=7.3;
+let t0=performance.now(), skipped=false, introDone=false, fam=null, nodes=[], ogNode=null, heroNodes=[];
+let mouse={x:-1e4,y:-1e4};
+stage.addEventListener('pointermove',e=>{const b=stage.getBoundingClientRect();mouse.x=e.clientX-b.left;mouse.y=e.clientY-b.top});
+stage.addEventListener('pointerleave',()=>{mouse.x=mouse.y=-1e4});
+function pickFeatured(d){
+  // the hottest runner that is a copy (and has its original's art), else the hottest runner
+  const rs=d.runners.filter(r=>r.total>=6);
+  rs.sort((a,b)=>((b.focusRank>0)-(a.focusRank>0))||((!!iconURL(b.og))-(!!iconURL(a.og)))||(b.runner.vol1h-a.runner.vol1h));
+  return rs[0]||d.runners[0];
+}
+function rnd(a,b){return a+Math.random()*(b-a)}
+const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
+const lerp=(a,b,k)=>a+(b-a)*k;
+async function setupIntro(d){
+  fam=pickFeatured(d); if(!fam)return;
+  const mob=innerWidth<700, cap=mob?22:40;
+  let members=[fam.og,...fam.copies];
+  if(members.length>cap){ // keep the runner and an even spread of the line
+    const keep=new Set([0,members.findIndex(m=>m.mint===fam.runner.mint)]); const step=(members.length-1)/(cap-1);
+    for(let i=0;i<cap;i++)keep.add(Math.round(i*step)); members=members.filter((m,i)=>keep.has(i)).slice(0,cap+2);
+  }
+  if(!members.find(m=>m.mint===fam.runner.mint)) members.push(fam.runner);
+  members.sort((a,b)=>a.created-b.created);
+  const ims=await Promise.all(members.map(loadImg));
+  nodes=members.map((m,i)=>({m,im:ims[i],slot:i,isOG:i===0,isRunner:m.mint===fam.runner.mint,rank:i===0?0:(m.n??[fam.og,...fam.copies].findIndex(x=>x.mint===m.mint)),a0:rnd(0,6.283),d0:rnd(.55,.85),sa:rnd(0,6.283),sr:rnd(.12,.34),spin:rnd(.15,.4)*(Math.random()<.5?-1:1),R:rnd(.026,.046)*Math.min(innerWidth,innerHeight)}));
+  ogNode=nodes[0];
+  const cps=nodes.filter(n=>!n.isOG&&!n.isRunner).sort((a,b)=>b.m.created-a.m.created); // newest leaves first
+  const run=nodes.find(n=>n.isRunner&&!n.isOG);
+  cps.forEach((n,i)=>n.stampAt=T_STAMP+(i/Math.max(1,cps.length))*1.05);
+  if(run) run.stampAt=T_STAMP+1.2;
+  layoutIntro(); layoutHero();
+  t0=performance.now(); if(reduce) skip();
+}
+function layoutIntro(){
+  if(!nodes.length)return; const L=W*(W<700?.9:.84), n=nodes.length;
+  nodes.forEach(nd=>{nd.qx=W/2-L/2+(n>1?nd.slot/(n-1):.5)*L; nd.qy=H*.5+Math.sin(nd.slot*.9)*(W<700?6:10); nd.qR=Math.max(4,Math.min(nd.R,L/n*.42)); if(nd.isOG)nd.qR=Math.max(nd.qR*1.6,14);});
+}
+function layoutHero(){
+  if(!fam||!nodes.length)return;
+  const mob=W<700, big=Math.min(W,H);
+  heroNodes=[]; nodes.forEach(n=>{if(!n.isOG)n.hx=n.hy=null});
+  const cx=W/2, top=mob?H*.25:H*.24;
+  const ogR=mob?44:Math.min(66,big*.075);
+  ogNode.hx=cx;ogNode.hy=top;ogNode.hR=ogR;
+  const list=nodes.filter(n=>!n.isOG).sort((a,b)=>(b.isRunner-a.isRunner)||(b.m.mcap-a.m.mcap)).slice(0,mob?5:8).sort((a,b)=>a.m.created-b.m.created);
+  const span=Math.min(W*.82,mob?W-96:880), y0=top+ogR+(mob?60:84);
+  list.forEach((n,i)=>{const f=list.length>1?i/(list.length-1):.5;n.hx=cx-span/2+f*span;n.hy=y0+Math.sin(f*Math.PI)*(mob?18:34)+(i%2?(mob?14:22):0);n.hR=n.isRunner?(mob?24:30):(mob?17:22);heroNodes.push(n)});
+}
+function skip(){ if(skipped)return; skipped=true; t0=performance.now()-T_SETTLE*1000; }
+$('#skip').onclick=skip;
+
+function grid(alpha,glow,gx,gy){
+  const st=W<700?12:14, tt=performance.now()/1000, R0=Math.min(W,H)*.42;
+  for(let y=st/2;y<H;y+=st)for(let x=st/2;x<W;x+=st){
+    const dx=x-gx,dy=y-gy,d=Math.sqrt(dx*dx+dy*dy), g=glow*Math.max(0,1-d/R0), w=.5+.5*Math.sin(d*.03-tt*2.2), r=.7+g*2.6*(.7+.3*w);
+    sx.fillStyle=g>.05?`rgba(255,${190+g*40|0},${40+g*60|0},${(.12+g*.55)*alpha})`:`rgba(60,58,48,${.55*alpha})`;
+    sx.fillRect(x-r/2,y-r/2,r,r);
+  }
+}
+function pill(x,y,txt,{col='#efece3',bg='rgba(10,10,8,.88)',bd='#8a8676',sz=10,rot=0,sc=1}={}){
+  sx.save();sx.translate(x,y);sx.rotate(rot);sx.scale(sc,sc);sx.font=`700 ${sz}px Silkscreen`;const tw=sx.measureText(txt).width+12,h=sz+8;
+  sx.fillStyle=bg;sx.fillRect(-tw/2,-h/2,tw,h);sx.strokeStyle=bd;sx.lineWidth=1;sx.strokeRect(-tw/2+.5,-h/2+.5,tw-1,h-1);sx.fillStyle=col;sx.textAlign='center';sx.textBaseline='middle';sx.fillText(txt,0,1);sx.restore();
+}
+function frame(now){
+  requestAnimationFrame(frame);
+  const t=(now-t0)/1000;
+  sx.clearRect(0,0,W,H);
+  if(!fam||!ogNode||ogNode.qx==null){ grid(.9,0,W/2,H/2); sx.font='500 12px "Fira Code",monospace';sx.fillStyle='#57544a';sx.textAlign='center';sx.fillText('reading every coin that shares a runner\'s name…',W/2,H/2); return; }
+  $('#progi').style.width=(clamp(t/T_SETTLE)*100)+'%';
+  const cx=W/2, cy=H/2, big=Math.min(W,H), tt=now/1000;
+  const kSort=ease(clamp((t-T_SORT)/1.25)), kRise=ease(clamp((t-T_RISE)/1.0)), kSet=ease(clamp((t-T_SETTLE)/1.0));
+  const o=ogNode;
+  // the original's position drives the glow
+  const oc={x:lerp(o.qx,cx,kRise),y:lerp(o.qy,cy,kRise)}; let ox=lerp(oc.x,o.hx,kSet), oy=lerp(oc.y,o.hy,kSet);
+  if(t<T_SORT){const f=ease(clamp((t-T_SWARM)/1.7));ox=lerp(cx+Math.cos(o.a0)*W*o.d0,cx+Math.cos(o.sa)*big*o.sr*1.6,f);oy=lerp(cy+Math.sin(o.a0)*H*o.d0,cy+Math.sin(o.sa)*big*o.sr,f);}
+  else if(t<T_SORT+1.25){const f=kSort;const sxp=cx+Math.cos(o.sa+t*o.spin*.2)*big*o.sr*1.6, syp=cy+Math.sin(o.sa+t*o.spin*.2)*big*o.sr;ox=lerp(sxp,o.qx,f);oy=lerp(syp,o.qy,f);}
+  const glow=clamp((t-T_RISE-.4)/.9);
+  grid(clamp(t/.8),glow*(1-kSet*.45),ox,oy);
+  // time axis under the queue
+  if(t>T_SORT&&t<T_RISE+.6){
+    const L=W*(W<700?.9:.84), al=Math.min(kSort,1-clamp((t-T_RISE)/.6)), y=H*.5+(W<700?40:54);
+    sx.save();sx.globalAlpha=al;sx.strokeStyle='#3d3a2f';sx.beginPath();sx.moveTo(cx-L/2,y);sx.lineTo(cx+L/2,y);sx.stroke();
+    sx.font='500 11px "Fira Code",monospace';sx.fillStyle='#8a8676';sx.textAlign='left';sx.fillText('born '+when(fam.og.created).slice(0,10),cx-L/2,y+18);sx.textAlign='right';sx.fillText('newest →',cx+L/2,y+18);sx.restore();
+  }
+  // threads in the hero
+  if(kSet>0){ sx.save();sx.globalAlpha=kSet;for(const n of heroNodes){sx.strokeStyle=n.isRunner?'rgba(239,236,227,.35)':'rgba(87,84,74,.55)';sx.lineWidth=1;sx.setLineDash(n.isRunner?[]:[2,4]);sx.beginPath();sx.moveTo(ox,oy+lerp(o.qR,o.hR,kSet));sx.lineTo(n.hx,n.hy-n.hR+(1-kSet)*40);sx.stroke();}sx.restore(); }
+  // copies
+  for(const n of nodes){
+    if(n.isOG)continue;
+    let x,y,R,a=1,grey=0,solid=0;
+    if(t<T_SORT){const f=ease(clamp((t-T_SWARM)/1.7));const ang=n.sa+t*n.spin*.2;x=lerp(cx+Math.cos(n.a0)*W*n.d0,cx+Math.cos(ang)*big*n.sr*1.6,f);y=lerp(cy+Math.sin(n.a0)*H*n.d0,cy+Math.sin(ang)*big*n.sr,f);R=n.R;a=clamp((t-.15)/.8);}
+    else {const ang=n.sa+t*n.spin*.2;const sxp=cx+Math.cos(ang)*big*n.sr*1.6,syp=cy+Math.sin(ang)*big*n.sr;x=lerp(sxp,n.qx,kSort);y=lerp(syp,n.qy,kSort);R=lerp(n.R,n.qR,kSort);
+      if(t>=n.stampAt){const k=clamp((t-n.stampAt-.25)/.8);grey=clamp((t-n.stampAt)/.2);y+=k*k*H*.45;a=1-k;}}
+    if(kSet>0&&n.hx!=null){const f=kSet;x=n.hx;y=n.hy+(1-f)*40+(f>=1?Math.sin(tt*1.1+n.hx*.02)*3:0);R=n.hR;a=f;const hov=Math.hypot(mouse.x-x,mouse.y-y)<R+10;grey=n.isRunner||hov?0:.92;solid=(n.isRunner||hov)?.85:0;n.x=x;n.y=y;n.dR=R;}
+    else if(kSet>0) a=Math.min(a,1-kSet);
+    if(a<=.01)continue;
+    halftone(sx,n.im,x,y,R,{grey,alpha:a,solid,cells:R>26?18:R>10?12:7});
+    // stamps
+    if(kSet===0&&n.stampAt&&t>=n.stampAt&&a>.05){const k=clamp((t-n.stampAt)/.18);
+      if(n.isRunner) pill(x,y-R-16,'COPY #'+n.rank+' · PUMPING NOW',{sc:1+.5*(1-k),rot:-.06});
+      else if(R>=9||n.slot%3===0) pill(x,y-R-12,'#'+n.rank,{sz:9,sc:1+.5*(1-k)});}
+    if(kSet===0&&n.isRunner&&t>T_SORT+.9&&t<n.stampAt){sx.save();sx.globalAlpha=clamp((t-T_SORT-.9)/.4);sx.font='700 10px Silkscreen';sx.fillStyle=GOLD;sx.textAlign='center';sx.fillText('PUMPING NOW',x,y-R-12);sx.restore();}
+    if(kSet>=1&&n.hx!=null){
+      sx.font=`600 ${W<700?10:11}px "Fira Code",monospace`;sx.textAlign='center';
+      sx.fillStyle=n.isRunner?'#efece3':'#8a8676';sx.fillText((n.isRunner?'▲ ':'')+'COPY #'+n.rank,x,y+R+16);
+      sx.fillStyle='#57544a';sx.fillText('+'+late(n.m.created-fam.og.created),x,y+R+30);
+      if(n.isRunner){sx.fillStyle=GOLD;sx.font='700 10px Silkscreen';sx.fillText('PUMPING NOW',Math.max(52,Math.min(W-52,x)),y-R-10)}
+    }
+  }
+  // the original
+  const oR=t<T_SORT?o.R:lerp(lerp(o.R,o.qR,kSort),big*.13,kRise), R=lerp(oR,o.hR,kSet);
+  o.x=ox;o.y=oy;o.dR=R;
+  if(glow>0){sx.save();const g=sx.createRadialGradient(ox,oy,R*.6,ox,oy,R*2.4);g.addColorStop(0,`rgba(255,198,26,${.32*glow})`);g.addColorStop(1,'rgba(255,198,26,0)');sx.fillStyle=g;sx.beginPath();sx.arc(ox,oy,R*2.4,0,6.283);sx.fill();sx.restore();}
+  halftone(sx,o.im,ox,oy,R,{alpha:t<T_SORT?clamp((t-.15)/.8):1,solid:clamp((t-T_RISE-.5)/.8),cells:R>50?26:R>14?16:9});
+  if(t>T_STAMP+1.3){ // the survivor is marked
+    const k=clamp((t-T_STAMP-1.3)/.35); sx.save();sx.strokeStyle=GOLD;sx.lineWidth=2;sx.globalAlpha=k;sx.shadowColor=GOLD;sx.shadowBlur=18;sx.beginPath();sx.arc(ox,oy,R+4,0,6.283);sx.stroke();sx.restore();
+    const pop=ease(clamp((t-T_RISE-.7)/.4)); if(pop>0) badge(sx,ox+R*.72,oy+R*.72,Math.max(20,R*.55)*(.6+.4*pop)*(1+.25*Math.sin(pop*Math.PI)),pop);
+  }
+  if(kSet>=1){sx.save();sx.font='700 11px Silkscreen';sx.textAlign='center';sx.fillStyle=GOLD;sx.fillText('ORIGINAL',ox,oy-R-14);sx.font=`600 ${W<700?11:12}px "Fira Code",monospace`;sx.fillStyle='#efece3';sx.fillText('$'+fam.og.symbol+' · '+when(fam.og.created).slice(0,10),ox,oy+R+22);sx.restore();}
+  // captions
+  const cap=$('#cap'),capv=$('#capv'),capk=$('#capk');
+  if(kSet===0){
+    if(t<T_SORT){capk.textContent='$'+fam.og.symbol;capv.textContent=`${fam.total} coins call themselves ${fam.og.name}.`}
+    else if(t<T_STAMP){capk.textContent='SORTING BY BIRTH';capv.textContent='Oldest on the left.'}
+    else if(t<T_RISE){capk.textContent='EVERYTHING AFTER IT';capv.textContent='is a copy.'}
+    else {capk.textContent='THE ORIGINAL';capv.innerHTML=`${esc(fam.og.name)} <span class="g">· ${when(fam.og.created)}</span>`}
+    const low=t>=T_RISE; cap.style.top=low?'auto':'13%'; cap.style.bottom=low?'15%':'auto'; cap.style.opacity=t<.4?0:1;
+  } else cap.style.opacity=0;
+  if(kSet>.55&&!introDone){
+    introDone=true; $('#heroUI').classList.add('on'); $('#prog').style.opacity=0; $('#skip').style.opacity=0; $('#skip').style.pointerEvents='none';
+    $('#nav').classList.remove('away'); $('#tick').classList.remove('away');
+    $('#h1').innerHTML=`${fam.total} coins. <em>One original.</em>`;
+    $('#sub').innerHTML=fam.focusRank>0?`The <b>$${esc(fam.runner.symbol)}</b> pumping right now is <b>copy #${fam.focusRank}</b>. The original was created ${late(fam.runner.created-fam.og.created)} earlier. ORIGIN finds the first coin for every runner, live.`:`ORIGIN finds the first coin for every runner on pump.fun and tags every copy, live.`;
+  }
+}
+requestAnimationFrame(frame);
+stage.addEventListener('click',()=>{ if(!introDone){skip();return} const n=heroNodes.find(n=>Math.hypot(mouse.x-n.x,mouse.y-n.y)<n.dR+10)||(ogNode&&Math.hypot(mouse.x-ogNode.x,mouse.y-ogNode.y)<ogNode.dR?ogNode:null); if(n){ runCheck(n.m.mint); location.hash='#check'; } });
+onData(d=>{ if(!fam) setupIntro(d); if(!$('#checkIn').value){ const f=pickFeatured(d); if(f) runCheck(f.runner.mint); } });
+
+/* ---------- halftone section titles ---------- */
+function drawTitle(cv,phase=-1){
+  const txt=cv.dataset.t, fs=Math.min(120,Math.max(54,innerWidth*.085));
+  const off=document.createElement('canvas'),ox=off.getContext('2d');
+  ox.font=`900 ${fs}px Onest`; const w=Math.ceil(ox.measureText(txt).width)+8, h=Math.ceil(fs*.92);
+  const maxW=cv.parentElement.clientWidth-(innerWidth<600?0:48); const sc=Math.min(1,maxW/w);
+  off.width=w;off.height=h;ox.font=`900 ${fs}px Onest`;ox.fillStyle='#fff';ox.textBaseline='alphabetic';ox.fillText(txt,2,h*.86);
+  const data=ox.getImageData(0,0,w,h).data;
+  cv.width=w*sc*DPR;cv.height=h*sc*DPR;cv.style.width=(w*sc)+'px';cv.style.height=(h*sc)+'px';
+  const c=cv.getContext('2d');c.setTransform(DPR*sc,0,0,DPR*sc,0,0);c.clearRect(0,0,w,h);
+  const st=Math.max(3.4,fs/26);
+  for(let y=st/2;y<h;y+=st)for(let x=st/2;x<w;x+=st){
+    const a=data[((y|0)*w+(x|0))*4+3]/255; if(a<.05)continue;
+    const g=phase<0?0:Math.max(0,1-Math.abs(x/w-phase)*5);
+    c.fillStyle=g>.02?`rgba(255,${200+g*30|0},${60+g*80|0},${.6+g*.4})`:`rgba(239,236,227,${.25+.6*a})`;
+    const r=st*.5*(.45+.55*a)*(1+g*.25); c.beginPath();c.arc(x,y,r,0,6.283);c.fill();
+  }
+}
+const titles=$$('canvas.ht');
+document.fonts.ready.then(()=>titles.forEach(c=>drawTitle(c)));
+addEventListener('resize',()=>titles.forEach(c=>drawTitle(c)));
+const tio=new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting)return; const cv=e.target; tio.unobserve(cv); let p=-.2; const step=()=>{p+=.025;drawTitle(cv,p);if(p<1.25)requestAnimationFrame(step);else drawTitle(cv)}; setTimeout(()=>requestAnimationFrame(step),250) }),{threshold:.6});
+titles.forEach(c=>tio.observe(c));
+const rio=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');rio.unobserve(e.target)}}),{threshold:.08});
+$$('.reveal').forEach(e=>rio.observe(e));
+
+/* ---------- avatars ---------- */
+function av(t,{og=false,grey=false,size=44,cls=''}={}){
+  const u=iconURL(t);
+  return `<div class="av ${og?'og':''} ${grey?'grey':''} ${cls}" style="width:${size}px;height:${size}px"><span class="ini" style="font-size:${Math.max(9,size*.26)|0}px">${esc(String(t&&t.symbol||'?').replace(/^\$/,'').slice(0,3).toUpperCase())}</span>${u?`<img src="${esc(u)}" alt="" loading="lazy" onerror="this.remove()">`:''}${og?`<img class="bd" src="${BADGE_URL}" alt="">`:''}</div>`;
+}
+
+/* ---------- ticker ---------- */
+onData(d=>{
+  const items=d.runners.map(r=>`<span class="it">${iconURL(r.runner)?`<img src="${esc(iconURL(r.runner))}" alt="">`:''}<b>$${esc(r.runner.symbol)}</b> <span class="${r.focusRank===0?'g':''}">${r.focusRank===0?'ORIGINAL':'copy #'+r.focusRank}</span> <span class="fa">· ${r.total} in family</span></span>`).join('');
+  $('#rail').innerHTML=items+items;
+  $('#ticklbl').textContent=SNAP?'SCAN · '+new Date(d.at).toISOString().slice(11,16)+' UTC':'LIVE SCAN';
+});
+
+/* ---------- BOARD ---------- */
+onData(d=>{
+  const copies=d.runners.filter(r=>r.focusRank>0).length, coins=d.runners.reduce((s,r)=>s+r.total,0);
+  $('#bmeta').innerHTML=`<span><span class="dot" style="display:inline-block;margin-right:8px"></span>scan · ${SNAP?'captured':'refreshed'} ${new Date(d.at).toISOString().slice(11,19)} UTC</span><span><b>${d.runners.length}</b> runners</span><span><b>${coins}</b> coins sorted by birth</span><span class="gb"><b class="gb">${copies}</b> of ${d.runners.length} pumping coins are copies</span>`;
+  $('#boardList').innerHTML=d.runners.map((r,i)=>{
+    const isog=r.focusRank===0, o=r.og, ru=r.runner;
+    const strip=[o,...r.copies].slice(1,13).map(c=>`<div class="m ${c.mint===ru.mint?'me':''}" title="$${esc(c.symbol)} · ${esc(c.name)} · +${late(c.created-o.created)}">${iconURL(c)?`<img src="${esc(iconURL(c))}" alt="" loading="lazy" onerror="this.remove()">`:''}</div>`).join('');
+    return `<div class="card rowc" data-mint="${esc(ru.mint)}" data-i="${i}">
+      <div class="rk">${String(i+1).padStart(2,'0')}</div>
+      <div class="coin">${av(ru,{og:isog})}<div class="t"><div class="nm">${esc(ru.name)}</div><div class="sb">$${esc(ru.symbol)} · ${money(ru.mcap)} · ${money(ru.vol1h)} 1h</div></div></div>
+      <div class="vcol">${isog?`<span class="verdict og">✓ THE ORIGINAL</span><span class="s">first of ${r.total} · ${r.total-1} copies after it</span>`:`<span class="verdict cp">COPY #${r.focusRank} OF ${r.total}</span><span class="s">${late(ru.created-o.created)} after the original</span>`}</div>
+      <div class="vcol ogc">${isog?`<div class="strip">${strip}${r.total>13?`<span class="more">+${r.total-13}</span>`:''}</div>`:`<div class="coin">${av(o,{og:true,size:36})}<div class="t"><div class="nm" style="font-size:14px">${esc(o.name)}</div><div class="sb">original · ${when(o.created).slice(0,10)} · ${money(o.mcap)}</div></div></div>`}</div>
+      <div class="go">lineage →</div>
+    </div>`;
+  }).join('');
+  $$('#boardList .rowc').forEach(el=>el.onclick=()=>{ selectLineage(+el.dataset.i); document.getElementById('lineage-sec').scrollIntoView({behavior:'smooth'}) });
+});
+
+/* ---------- CHECK ---------- */
+async function checkData(ca){
+  if(!SNAP){ const r=await fetch('/api/check?ca='+encodeURIComponent(ca)); if(r.status===400) throw new Error('That isn\'t a Solana address.'); if(!r.ok) throw new Error('Check didn\'t answer. Try again.'); return r.json(); }
+  // preview: look inside the captured scan
+  for(const r of SNAP.runners){ const fam=[r.og,...r.copies]; const idx=fam.findIndex(x=>x.mint===ca); if(idx>=0) return {found:true,coin:fam[idx],og:r.og,total:r.total,focusRank:idx===0?0:(fam[idx].n??idx),copies:r.copies,tickerOnly:r.tickerOnly}; }
+  return {found:false,preview:true};
+}
+async function runCheck(ca){
+  ca=String(ca||'').trim(); const box=$('#checkRes'); $('#checkIn').value=ca;
+  if(!ca){box.innerHTML='';return}
+  box.innerHTML=`<div class="skel" style="height:160px;border-radius:14px"></div>`;
+  try{
+    const d=await checkData(ca);
+    if(!d.found){ box.innerHTML=`<div class="err">${d.preview?'Not in this captured scan. Click any coin on the board or in the hero to check it.':'No coin found at that address on Jupiter\'s index.'}</div>`; return; }
+    const isog=d.focusRank===0, c=d.coin, o=d.og;
+    const [ci,oi]=await Promise.all([loadImg(c),loadImg(o)]); const m=isog?null:match(ahash(ci),ahash(oi));
+    const buy=x=>`https://pump.fun/coin/${x.mint}`, chart=x=>`https://gmgn.ai/sol/token/${x.mint}`;
+    box.innerHTML=`<div class="vc ${isog?'isog':''}">
+      ${av(c,{og:isog,cls:'big',size:108})}
+      <div>
+        <div class="pix ${isog?'g':'mu'}" style="font-size:12px;letter-spacing:.14em">${isog?'VERIFIED ORIGINAL':'COPY #'+d.focusRank+' OF '+d.total}</div>
+        <h3>${isog?`This is the first ${esc(c.name)}.`:`${esc(c.name)} came ${late(c.created-o.created)} late.`}</h3>
+        <div class="line">${isog?`${d.total-1} coins with the same name and ticker came after it.`:`The original <b>${esc(o.name)}</b> ($${esc(o.symbol)}) was created ${when(o.created)}. Yours was created ${when(c.created)}.`}</div>
+        <div class="facts">
+          <span class="fact">created <b>${when(c.created)}</b></span>
+          <span class="fact">mcap <b>${money(c.mcap)}</b></span>
+          <span class="fact">family <b>${d.total}</b> coins</span>
+          ${m!=null?`<span class="fact ${m>=85?'g':''}">PFP match <b>${m}%</b> with the original</span>`:''}
+          ${d.tickerOnly?`<span class="fact">${d.tickerOnly} more coins squat <b>$${esc(c.symbol)}</b></span>`:''}
+        </div>
+        <div class="acts">${isog?'':`<a class="pill" href="${buy(o)}" target="_blank" rel="noopener">Open the original</a>`}<a class="pill ghost" href="${chart(isog?c:o)}" target="_blank" rel="noopener">Chart</a><button class="pill ghost" type="button" data-copy="${esc(isog?c.mint:o.mint)}">Copy ${isog?'CA':'original CA'}</button></div>
+      </div></div>`;
+    $('[data-copy]',box)?.addEventListener('click',e=>{navigator.clipboard?.writeText(e.currentTarget.dataset.copy);toast('Copied '+short(e.currentTarget.dataset.copy))});
+  }catch(e){ box.innerHTML=`<div class="err">${esc(e.message||'Check failed.')}</div>`; }
+}
+$('#checkForm').onsubmit=e=>{e.preventDefault();runCheck($('#checkIn').value)};
+$('#heroForm').onsubmit=e=>{e.preventDefault();const v=$('#heroIn').value.trim();if(!v)return;document.getElementById('check').scrollIntoView({behavior:'smooth'});runCheck(v)};
+
+/* ---------- LINEAGE ---------- */
+const lc=$('#lineage'), lx=lc.getContext('2d'); let LW=0,LH=0, lin=null, linPts=[], linT=0, linHover=null;
+function lsize(){LW=lc.clientWidth;LH=lc.clientHeight;lc.width=LW*DPR;lc.height=LH*DPR;lx.setTransform(DPR,0,0,DPR,0,0);buildLin()}
+addEventListener('resize',lsize);
+let linSel=0;
+function selectLineage(i){ if(!DATA)return; linSel=i; $$('#chips .chip').forEach((c,k)=>c.classList.toggle('on',k===i)); lin=DATA.runners[i]; buildLin(); linT=performance.now(); }
+async function buildLin(){
+  if(!lin||!LW)return; const fam=[lin.og,...lin.copies]; const o=lin.og;
+  const t1=Math.max(...fam.map(f=>f.created),Date.now()-6e4); const span=Math.max(6e4,t1-o.created);
+  const padL=LW<600?40:70, padR=LW<600?24:50, mid=LH*.56;
+  const mx=Math.max(...fam.map(f=>f.mcap||0),1);
+  const ims=await Promise.all(fam.map(loadImg));
+  linPts=fam.map((f,i)=>{ const x=padL+(fam.length>1?i/(fam.length-1):0)*(LW-padL-padR); const r=i===0?(LW<600?18:24):Math.max(4,Math.min(LW<600?13:18,4+Math.sqrt((f.mcap||0)/mx)*16));
+    const lane=i===0?0:((i%5)-2)*(LH*.085)+(i%2?8:-8); return {f,i,x,y:mid+lane,r,im:ims[i],run:f.mint===lin.runner.mint}; });
+}
+function linFrame(now){
+  requestAnimationFrame(linFrame); if(!LW||!lin)return;
+  const k=Math.min(1,(now-linT)/1400); lx.clearRect(0,0,LW,LH);
+  const mid=LH*.56, padL=LW<600?40:70, padR=LW<600?24:50;
+  // axis
+  lx.strokeStyle='#2f2d24';lx.lineWidth=1;lx.beginPath();lx.moveTo(padL,mid);lx.lineTo(padL+(LW-padL-padR)*k,mid);lx.stroke();
+  lx.font='500 11px "Fira Code",monospace';lx.fillStyle='#57544a';lx.textAlign='center';
+  const o=lin.og, fam=[o,...lin.copies]; const t1=Math.max(...fam.map(f=>f.created),Date.now()-6e4), span=Math.max(6e4,t1-o.created);
+  (LW<600?[0,.5,1]:[0,.25,.5,.75,1]).forEach(q=>{const x=padL+q*(LW-padL-padR);const f=fam[Math.round(q*(fam.length-1))];if(!f)return;lx.textAlign=q===0?'left':q===1?'right':'center';lx.fillText(q===0?'born '+when(f.created).slice(0,10):'#'+Math.round(q*(fam.length-1))+' · +'+late(f.created-o.created),q===0?x-10:q===1?x+10:x,LH-18);lx.fillRect(x,mid-3,1,6)});
+  for(const p of linPts){
+    const appear=Math.max(0,Math.min(1,k*1.25-(p.x-padL)/(LW)*.9)); if(appear<=0)continue;
+    lx.strokeStyle=p.i===0?'rgba(255,198,26,.5)':'rgba(87,84,74,.45)';lx.beginPath();lx.moveTo(p.x,mid);lx.lineTo(p.x,p.y);lx.stroke();
+    const hov=linHover===p;
+    if(p.i===0){ lx.save();const g=lx.createRadialGradient(p.x,p.y,p.r,p.x,p.y,p.r*3);g.addColorStop(0,'rgba(255,198,26,.3)');g.addColorStop(1,'rgba(255,198,26,0)');lx.fillStyle=g;lx.beginPath();lx.arc(p.x,p.y,p.r*3,0,6.283);lx.fill();lx.restore(); }
+    halftone(lx,p.im,p.x,p.y,p.r*appear*(hov?1.25:1),{grey:p.i===0||p.run||hov?0:.95,solid:p.i===0||p.run||hov?.9:0,cells:p.r>12?14:8,alpha:p.i===0||p.run||hov?1:.8});
+    if(p.i===0){lx.strokeStyle=GOLD;lx.lineWidth=2;lx.beginPath();lx.arc(p.x,p.y,p.r+3,0,6.283);lx.stroke();lx.lineWidth=1;badge(lx,p.x+p.r*.8,p.y+p.r*.8,16,appear);lx.font='700 10px Silkscreen';lx.fillStyle=GOLD;lx.textAlign='center';lx.fillText('ORIGINAL',p.x,p.y-p.r-12)}
+    if(p.run){lx.strokeStyle='#efece3';lx.lineWidth=1.5;lx.beginPath();lx.arc(p.x,p.y,p.r+3,0,6.283);lx.stroke();lx.lineWidth=1;lx.font='700 10px Silkscreen';lx.fillStyle='#efece3';lx.textAlign='center';{const near=Math.abs(p.x-linPts[0].x)<120;lx.fillText('COPY #'+(p.f.n??p.i)+' · PUMPING',Math.max(70,Math.min(LW-70,p.x)),near?p.y+p.r+18:p.y-p.r-12)}}
+  }
+}
+requestAnimationFrame(linFrame);
+lc.addEventListener('pointermove',e=>{const b=lc.getBoundingClientRect(),x=e.clientX-b.left,y=e.clientY-b.top;let best=null,bd=1e9;for(const p of linPts){const d=Math.hypot(p.x-x,p.y-y);if(d<p.r+8&&d<bd){bd=d;best=p}}linHover=best;const tip=$('#tip');
+  if(best){const f=best.f;tip.innerHTML=`<b>${esc(f.name)}</b><br>$${esc(f.symbol)} · ${best.i===0?'<span class="g">original</span>':'copy #'+(best.f.n??best.i)}<br>${when(f.created)}${best.i?`<br>+${late(f.created-lin.og.created)} late`:''}<br>mcap ${money(f.mcap)}`;tip.style.opacity=1;tip.style.left=Math.min(LW-200,x+14)+'px';tip.style.top=Math.max(8,y-90)+'px';lc.style.cursor='pointer'}else{tip.style.opacity=0;lc.style.cursor='crosshair'}});
+lc.addEventListener('pointerleave',()=>{linHover=null;$('#tip').style.opacity=0});
+lc.addEventListener('click',()=>{if(linHover){runCheck(linHover.f.mint);document.getElementById('check').scrollIntoView({behavior:'smooth'})}});
+onData(d=>{
+  $('#chips').innerHTML=d.runners.map((r,i)=>`<button class="chip ${i===linSel?'on':''}" data-i="${i}">${iconURL(r.runner)?`<img src="${esc(iconURL(r.runner))}" alt="">`:''}$${esc(r.runner.symbol)}</button>`).join('');
+  $$('#chips .chip').forEach(c=>c.onclick=()=>selectLineage(+c.dataset.i));
+  if(!lin){ const f=pickFeatured(d); linSel=Math.max(0,d.runners.indexOf(f)); }
+  lsize(); selectLineage(Math.min(linSel,d.runners.length-1));
+});
+
+/* ---------- LIVE (PumpPortal) ---------- */
+let launches=0, caught=0; const feed=$('#feed');
+function pushLaunch(ev){
+  launches++; $('#sLaunch').textContent=launches.toLocaleString();
+  let hit=null;
+  if(DATA) for(const r of DATA.runners){ if(norm(ev.symbol)===norm(r.runner.symbol)&&sameName(ev.name,r.runner.name)){ hit=r; break; } }
+  const row=document.createElement('div'); row.className='fr'+(hit?' hit':'');
+  const n=hit?(hit.total+(hit._live=(hit._live||0)+1)-1):0;
+  if(hit){caught++;$('#sCopy').textContent=caught;}
+  row.innerHTML=`<div class="ic">${esc((ev.symbol||'?').slice(0,3).toUpperCase())}</div><div class="x"><b>${esc(ev.name||'unnamed')}</b><span>$${esc(ev.symbol||'')} · ${short(ev.mint)} · ${new Date(ev.ts).toISOString().slice(11,19)}</span></div>${hit?`<span class="tag"><span class="stamp">COPY #${n} OF $${esc(hit.runner.symbol)}</span></span>`:`<span class="tag">new</span>`}`;
+  feed.prepend(row); while(feed.children.length>40) feed.lastChild.remove();
+  if(ev.uri) loadMeta(ev.uri,row);
+}
+async function loadMeta(uri,row){ if(SNAP)return; try{const r=await fetch(uri);if(!r.ok)return;const j=await r.json();if(j.image){const im=new Image();im.onload=()=>{const ic=$('.ic',row);ic.textContent='';ic.appendChild(im)};im.src='/api/img?u='+encodeURIComponent(j.image)}}catch(e){} }
+function liveFeed(){
+  if(SNAP&&SNAP.launches){ // preview: replays the real launches captured with the scan, at their real pace
+    $('#sFeed').textContent='replaying capture'; const L=SNAP.launches.slice(); L.splice(0,7).forEach(pushLaunch); const t0=L[0]?.ts||0; const s0=performance.now();
+    (function step(){ const el=performance.now()-s0; while(L.length&&L[0].ts-t0<=el) pushLaunch(L.shift()); if(L.length) setTimeout(step,200); else $('#sFeed').textContent='capture ended'; })(); return;
+  }
+  let ws, retry=0;
+  const open=()=>{ try{ws=new WebSocket('wss://pumpportal.fun/api/data')}catch(e){return}
+    ws.onopen=()=>{retry=0;$('#sFeed').innerHTML='<span class="g">● live</span>';ws.send(JSON.stringify({method:'subscribeNewToken'}))};
+    ws.onmessage=e=>{try{const m=JSON.parse(e.data);if(m.txType==='create'&&m.mint)pushLaunch({mint:m.mint,name:m.name,symbol:m.symbol,uri:m.uri,ts:Date.now()})}catch(_){}};
+    ws.onclose=()=>{$('#sFeed').textContent='reconnecting…';setTimeout(open,Math.min(15000,1000*2**retry++))};
+  }; open();
+}
+const lio=new IntersectionObserver(es=>{if(es[0].isIntersecting){lio.disconnect();liveFeed()}},{rootMargin:'600px'}); lio.observe($('#live'));
+
+/* ---------- HOURLY BUY ---------- */
+function tickClock(){ const now=new Date(); const left=3600-(now.getUTCMinutes()*60+now.getUTCSeconds()); const m=Math.floor(left/60),s=left%60; $('#cd').innerHTML=`${String(m).padStart(2,'0')}<span>:</span>${String(s).padStart(2,'0')}`; }
+setInterval(tickClock,1000); tickClock();
+onData(d=>{
+  const top=d.runners.slice().sort((a,b)=>b.runner.vol1h-a.runner.vol1h)[0]; if(!top)return; const o=top.og;
+  $('#target').innerHTML=`${av(o,{og:true,size:56})}<div style="min-width:0"><div class="t1">NEXT TARGET · LIVE</div><div class="t2">${esc(o.name)} <span class="mu" style="font-weight:500">$${esc(o.symbol)}</span></div><div class="t3">original of $${esc(top.runner.symbol)} · ${money(top.runner.vol1h)} 1h on the ${top.focusRank?'copy #'+top.focusRank:'original'} · ${short(o.mint)}</div></div>`;
+});
+async function buyLog(){
+  if(!CFG.WALLET||SNAP)return; try{ const r=await fetch('/api/buys?wallet='+encodeURIComponent(CFG.WALLET)); if(r.status!==200)return; const d=await r.json(); const log=$('#log');
+    log.hidden=false; log.innerHTML=`<div class="lr" style="color:var(--mu)"><span class="when">wallet ${short(CFG.WALLET)}</span><span></span><a href="https://solscan.io/account/${esc(CFG.WALLET)}" target="_blank" rel="noopener">solscan →</a></div>`+(d.buys.length?d.buys.map(b=>`<div class="lr"><span class="when">${new Date(b.ts).toISOString().slice(0,16).replace('T',' ')} UTC</span><span>${b.sol} SOL → ${short(b.mint)}</span><a href="https://solscan.io/tx/${esc(b.sig)}" target="_blank" rel="noopener">tx →</a></div>`).join(''):`<div class="lr"><span class="when mu">no buys yet</span></div>`);
+  }catch(e){} }
+buyLog(); setInterval(buyLog,60000);
+
+/* ---------- TOKEN ---------- */
+if(CFG.CA){ $('#caBox').hidden=false; $('#caTxt').textContent=CFG.CA; $('#caBox').onclick=()=>{navigator.clipboard?.writeText(CFG.CA);toast('CA copied')};
+  const b=$('#aBuy'); b.hidden=false; b.href=CFG.BUY||('https://pump.fun/coin/'+CFG.CA); const c=$('#aChart'); c.hidden=false; c.href=CFG.CHART||('https://gmgn.ai/sol/token/'+CFG.CA);
+  $('#navbuy').href=b.href; $('#navbuy').target='_blank'; $('#navbuy').textContent='Buy $'+(CFG.TICKER||'ORIGIN'); }
+if(CFG.X){ const x=$('#aX'); x.hidden=false; x.href=CFG.X; }
+
+/* nav state */
+const secs=['board','check','lineage-sec','live','buy','how'].map(id=>document.getElementById(id));
+addEventListener('scroll',()=>{ let cur=null; for(const s of secs){ if(s.getBoundingClientRect().top<innerHeight*.4) cur=s.id } $$('#links a').forEach(a=>a.classList.toggle('on',a.getAttribute('href')==='#'+cur)); },{passive:true});
+
+refresh(); if(!SNAP) setInterval(refresh,60000);
+})();
+</script>
+</body>
+</html>
